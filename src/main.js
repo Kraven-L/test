@@ -7,16 +7,16 @@ import router from './router'
 // 引入整个MintUI 样式需要单独引入
 import MintUI from 'mint-ui'
 import 'mint-ui/lib/style.css'
+Vue.use(MintUI);
 
 //引入axios来发送请求 
 import axios from 'axios'
 Vue.prototype.$axios = axios;
 
-// import { Datetime } from 'vux'
-// Vue.component('datetime' , Datetime)
+import Moment from 'moment'
+Vue.use(Moment);
 
 import '../static/css/global.css'
-Vue.use(MintUI);
 Vue.config.productionTip = false
 /* eslint-disable no-new */
 new Vue({

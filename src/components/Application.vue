@@ -54,11 +54,31 @@
         </div>
         <div class="section">
             <p>开始时间</p>
-            <p>2018-03-06 17:30</p>
+            <p @click="openPicker()">{{this.dateTime}}</p>
+            <mt-datetime-picker
+              type="datetime"
+              ref="picker"
+              year-format="{value}"
+              month-format="{value}"
+              date-format="{value}"
+              @confirm="handleConfirm"
+              :startDate="startDate"
+              >
+            </mt-datetime-picker>
         </div>
         <div class="section">
             <p>结束时间</p>
-            <p>2018-03-06 17:30</p>
+            <p @click="openPicker()">{{this.dateTime}}</p>
+            <mt-datetime-picker
+              type="datetime"
+              ref="picker"
+              year-format="{value}"
+              month-format="{value}"
+              date-format="{value}"
+              @confirm="handleConfirm"
+              :startDate="startDate"
+              >
+            </mt-datetime-picker>
         </div>
         <div class="section">
             <div class="date_day">
@@ -82,7 +102,7 @@
 
 <script>
 let apiLink = "http://qy.sunjee.cn:8021";
-
+import moment from 'moment'
 export default {
   name: "App",
   data() {
@@ -92,12 +112,16 @@ export default {
       selectedClass: 1,
       classes: [],
       types: [],
+      dateTime: '',
+      startDate: new Date(),
+      endDate : new Date(),
     };
   },
   mounted() {
     this.getArea();
     this.getType();
     this.getClassInfo(this.selected);
+    this.getTime();
   },
   methods: {
     change() {
@@ -128,6 +152,17 @@ export default {
         }
       });
     },
+    openPicker () {
+      this.$refs.picker.open()
+    },
+    handleConfirm (data) {
+      let date = moment(data).format('YYYY-MM-DD HH:mm')
+      this.dateTime = date
+    },
+    getTime(){
+      let now = moment(new Date()).format('YYYY-MM-DD HH:mm')
+      this.dateTime = now
+    }
   }
 };
 </script>
@@ -167,6 +202,7 @@ export default {
     p:nth-child(1) {
       font-size: 14px;
       color: #999;
+      line-height: 22px;
     }
     p:nth-child(2) {
       font-size: 14px;
@@ -181,6 +217,7 @@ export default {
         width: 88%;
         -webkit-appearance: none;
         -moz-appearance: none;
+        line-height: 22px;
         option {
           outline: none;
         }
@@ -192,6 +229,7 @@ export default {
         background: url(../assets/img/pull.png) no-repeat;
         background-size: cover;
         position: absolute;
+        top: 30%;
       }
     }
     .date_day {
