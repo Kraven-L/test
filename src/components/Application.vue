@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div >
     <div class="top">
         <div class="status">
             
@@ -54,40 +54,40 @@
         </div>
         <div class="section">
             <p>开始时间</p>
-            <p @click="openPicker()">{{this.dateTime}}</p>
+            <p @click="openPicker1()">{{this.startTime}}</p>
             <mt-datetime-picker
               type="datetime"
-              ref="picker"
+              ref="picker1"
               year-format="{value}"
               month-format="{value}"
               date-format="{value}"
-              @confirm="handleConfirm"
+              @confirm="handleConfirm1"
               :startDate="startDate"
               >
             </mt-datetime-picker>
         </div>
         <div class="section">
             <p>结束时间</p>
-            <p @click="openPicker()">{{this.dateTime}}</p>
+            <p @click="openPicker2()">{{this.endTime}}</p>
             <mt-datetime-picker
               type="datetime"
-              ref="picker"
+              ref="picker2"
               year-format="{value}"
               month-format="{value}"
               date-format="{value}"
-              @confirm="handleConfirm"
-              :startDate="startDate"
+              @confirm="handleConfirm2"
+              :startDate="endDate"
               >
             </mt-datetime-picker>
         </div>
         <div class="section">
             <div class="date_day">
                 <p>天</p>
-                <p>1</p>
+                <p>{{durationDay}}</p>
             </div>
             <div class="date_hour">
                 <p>小时</p>
-                <p>15</p>
+                <p>{{durationHour}}</p>
             </div>
         </div>
         <div class="section">
@@ -102,9 +102,9 @@
 
 <script>
 let apiLink = "http://qy.sunjee.cn:8021";
-import moment from 'moment'
+import moment from "moment";
+import { Toast } from "mint-ui";
 export default {
-  name: "App",
   data() {
     return {
       selected: 1,
@@ -112,16 +112,19 @@ export default {
       selectedClass: 1,
       classes: [],
       types: [],
-      dateTime: '',
+      startTime: "",
+      endTime: "",
       startDate: new Date(),
-      endDate : new Date(),
+      endDate: new Date(),
+      durationDay: 0,
+      durationHour: 0
     };
   },
   mounted() {
     this.getArea();
     this.getType();
     this.getClassInfo(this.selected);
-    this.getTime();
+    this.getNowTime();
   },
   methods: {
     change() {
@@ -152,16 +155,45 @@ export default {
         }
       });
     },
-    openPicker () {
-      this.$refs.picker.open()
+    openPicker1() {
+      this.$refs.picker1.open();
     },
-    handleConfirm (data) {
-      let date = moment(data).format('YYYY-MM-DD HH:mm')
-      this.dateTime = date
+    openPicker2() {
+      this.$refs.picker2.open();
     },
-    getTime(){
-      let now = moment(new Date()).format('YYYY-MM-DD HH:mm')
-      this.dateTime = now
+    handleConfirm1(data) {
+      let date = moment(data).format("YYYY-MM-DD HH:mm");
+      this.startTime = date;
+      if (
+        moment(this.startTime).isAfter(moment(this.endTime))
+      ) {
+        this.endTime = this.startTime;
+      }
+      this.durationDay = moment(this.endTime).diff(moment(this.startTime), "days")
+      this.durationHour = moment(this.endTime).diff(moment(this.startTime), "hours")-this.durationDay*24
+      
+    },
+    handleConfirm2(data) {
+      let date = moment(data).format("YYYY-MM-DD HH:mm");
+      this.endTime = date;
+      if (moment(this.endTime).isBefore(moment(this.startTime))) {
+        this.endTime = this.startTime;
+        Toast("结束时间不能早于开始时间");
+        return;
+      } else if (
+        moment(this.endTime).diff(moment(this.startTime)) > 432000000
+      ) {
+        this.endTime = this.startTime;
+        Toast("请假时间不能大于5天");
+        return;
+      }
+      this.durationDay = moment(this.endTime).diff(moment(this.startTime), "days")
+      this.durationHour = moment(this.endTime).diff(moment(this.startTime), "hours")-this.durationDay*24
+    },
+    getNowTime() {
+      let now = moment(new Date()).format("YYYY-MM-DD HH:mm");
+      this.startTime = now;
+      this.endTime = now;
     }
   }
 };
