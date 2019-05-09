@@ -114,12 +114,17 @@ export default {
       types: [],
       startTime: "",
       endTime: "",
-      startDate: new Date(),
+      startDate: moment(new Date()).subtract(1,'day')._d,
       endDate: new Date(),
       durationDay: 0,
-      durationHour: 0
+      durationHour: 0,
+      nowDate:new Date(),
+      oldDate :''
     };
   },
+  // computed(){
+  //   // this.oldDate = this.nowDate.setDate(this.nowDate.getDate()-1)
+  // },
   mounted() {
     this.getArea();
     this.getType();
@@ -137,6 +142,8 @@ export default {
           this.areas = response.data.msg;
         }
       });
+      console.log(new Date())
+      console.log(moment(new Date()).subtract(1,'day')._d)
     },
     getClassInfo(e) {
       let url = apiLink + "/api/Leave/GetClassInfo/" + e;
@@ -208,7 +215,7 @@ export default {
   .user_image {
     width: 90px;
     height: 90px;
-    background: url(../assets/img/Avatar.png) no-repeat;
+    background: url(../../static/img/Avatar.png) no-repeat;
     background-size: cover;
     position: absolute;
     left: 50%;
@@ -258,7 +265,7 @@ export default {
         content: "";
         width: 17px;
         height: 10px;
-        background: url(../assets/img/pull.png) no-repeat;
+        background: url(../../static/img/pull.png) no-repeat;
         background-size: cover;
         position: absolute;
         top: 30%;
