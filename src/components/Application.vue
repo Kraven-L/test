@@ -54,31 +54,33 @@
         </div>
         <div class="section">
             <p>开始时间</p>
-            <p @click="openPicker()">{{this.dateTime}}</p>
-            <mt-datetime-picker
+            <p @click="openPicker(0)">{{this.dateTime}}</p>
+            <!-- <mt-datetime-picker
+              v-show="'dateTimeshow'"
               type="datetime"
               ref="picker"
               year-format="{value}"
               month-format="{value}"
               date-format="{value}"
-              @confirm="handleConfirm"
+              @confirm="handleConfirm1"
               :startDate="startDate"
               >
-            </mt-datetime-picker>
+            </mt-datetime-picker> -->
         </div>
         <div class="section">
             <p>结束时间</p>
-            <p @click="openPicker()">{{this.dateTime}}</p>
-            <mt-datetime-picker
+            <p @click="openPicker(1)">{{this.endTime}}</p>
+            <!-- <mt-datetime-picker
+              v-show="'endTimeshow'"
               type="datetime"
               ref="picker"
               year-format="{value}"
               month-format="{value}"
               date-format="{value}"
-              @confirm="handleConfirm"
+              @confirm="handleConfirm2"
               :startDate="startDate"
               >
-            </mt-datetime-picker>
+            </mt-datetime-picker> -->
         </div>
         <div class="section">
             <div class="date_day">
@@ -97,14 +99,21 @@
         <!-- <router-link></router-link> -->
         <input type="submit" >
     </form>
+        <date-picker v-if="dateTimeshow" @subStart="getStart"></date-picker>
+        <date-picker v-if="endTimeshow" @subStart="getEnd"></date-picker>
+    
   </div>
 </template>
 
 <script>
 let apiLink = "http://qy.sunjee.cn:8021";
-import moment from 'moment'
+import moment from "moment";
+import datePicker from "./datePicker";
 export default {
   name: "App",
+  components:{
+    datePicker
+  },
   data() {
     return {
       selected: 1,
@@ -112,16 +121,22 @@ export default {
       selectedClass: 1,
       classes: [],
       types: [],
-      dateTime: '',
-      startDate: new Date(),
-      endDate : new Date(),
+      dateTime: "",
+      endTime:"",
+      dateTimeshow:null,
+      endTimeshow:null,
+      // startDate: new Date(),
+      // endDate: new Date()
     };
   },
+  computed:{
+  },
   mounted() {
+    this.dateTime = moment(new Date()).format("YYYY-MM-DD HH:mm")
+    this.endTime = moment(new Date()).format("YYYY-MM-DD HH:mm")
     this.getArea();
     this.getType();
     this.getClassInfo(this.selected);
-    this.getTime();
   },
   methods: {
     change() {
@@ -152,16 +167,36 @@ export default {
         }
       });
     },
-    openPicker () {
-      this.$refs.picker.open()
+    openPicker(e) {
+
+      if(e){
+        this.endTimeshow = 1;
+        console.log('end')
+      }else{
+        console.log('start')
+        this.dateTimeshow = 1;
+      }
+      
     },
-    handleConfirm (data) {
-      let date = moment(data).format('YYYY-MM-DD HH:mm')
-      this.dateTime = date
+    // handleConfirm1(data) {
+    //     console.log('start')
+    //   let date = moment(data).format("YYYY-MM-DD HH:mm");
+    //   this.dateTime = date;
+    // },
+    // handleConfirm2(data) {
+    //     console.log('end')
+    //   let date = moment(data).format("YYYY-MM-DD HH:mm");
+    //   this.endTime = date;
+    // },
+    getStart(e){
+      // alert(e)
+      this.dateTime = e
+      this.dateTimeshow =0
     },
-    getTime(){
-      let now = moment(new Date()).format('YYYY-MM-DD HH:mm')
-      this.dateTime = now
+    getEnd(e){
+      this.endTime = e
+        this.endTimeshow = 0;
+      
     }
   }
 };
