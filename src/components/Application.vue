@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div >
     <div class="top">
         <div class="status">
             
@@ -54,11 +54,10 @@
         </div>
         <div class="section">
             <p>开始时间</p>
-            <p @click="openPicker(0)">{{this.dateTime}}</p>
-            <!-- <mt-datetime-picker
-              v-show="'dateTimeshow'"
+            <p @click="openPicker1()">{{this.startTime}}</p>
+            <mt-datetime-picker
               type="datetime"
-              ref="picker"
+              ref="picker1"
               year-format="{value}"
               month-format="{value}"
               date-format="{value}"
@@ -69,27 +68,26 @@
         </div>
         <div class="section">
             <p>结束时间</p>
-            <p @click="openPicker(1)">{{this.endTime}}</p>
-            <!-- <mt-datetime-picker
-              v-show="'endTimeshow'"
+            <p @click="openPicker2()">{{this.endTime}}</p>
+            <mt-datetime-picker
               type="datetime"
-              ref="picker"
+              ref="picker2"
               year-format="{value}"
               month-format="{value}"
               date-format="{value}"
               @confirm="handleConfirm2"
-              :startDate="startDate"
+              :startDate="endDate"
               >
             </mt-datetime-picker> -->
         </div>
         <div class="section">
             <div class="date_day">
                 <p>天</p>
-                <p>1</p>
+                <p>{{durationDay}}</p>
             </div>
             <div class="date_hour">
                 <p>小时</p>
-                <p>15</p>
+                <p>{{durationHour}}</p>
             </div>
         </div>
         <div class="section">
@@ -108,12 +106,8 @@
 <script>
 let apiLink = "http://qy.sunjee.cn:8021";
 import moment from "moment";
-import datePicker from "./datePicker";
+import { Toast } from "mint-ui";
 export default {
-  name: "App",
-  components:{
-    datePicker
-  },
   data() {
     return {
       selected: 1,
@@ -121,22 +115,26 @@ export default {
       selectedClass: 1,
       classes: [],
       types: [],
-      dateTime: "",
-      endTime:"",
-      dateTimeshow:null,
-      endTimeshow:null,
-      // startDate: new Date(),
-      // endDate: new Date()
+      startTime: "",
+      endTime: "",
+      startDate: moment(new Date()).subtract(1,'day')._d,
+      endDate: new Date(),
+      durationDay: 0,
+      durationHour: 0,
+      nowDate:new Date(),
+      oldDate :''
     };
   },
-  computed:{
-  },
+  // computed(){
+  //   // this.oldDate = this.nowDate.setDate(this.nowDate.getDate()-1)
+  // },
   mounted() {
     this.dateTime = moment(new Date()).format("YYYY-MM-DD HH:mm")
     this.endTime = moment(new Date()).format("YYYY-MM-DD HH:mm")
     this.getArea();
     this.getType();
     this.getClassInfo(this.selected);
+    this.getNowTime();
   },
   methods: {
     change() {
@@ -149,6 +147,8 @@ export default {
           this.areas = response.data.msg;
         }
       });
+      console.log(new Date())
+      console.log(moment(new Date()).subtract(1,'day')._d)
     },
     getClassInfo(e) {
       let url = apiLink + "/api/Leave/GetClassInfo/" + e;
@@ -167,36 +167,45 @@ export default {
         }
       });
     },
-    openPicker(e) {
-
-      if(e){
-        this.endTimeshow = 1;
-        console.log('end')
-      }else{
-        console.log('start')
-        this.dateTimeshow = 1;
+    openPicker1() {
+      this.$refs.picker1.open();
+    },
+    openPicker2() {
+      this.$refs.picker2.open();
+    },
+    handleConfirm1(data) {
+      let date = moment(data).format("YYYY-MM-DD HH:mm");
+      this.startTime = date;
+      if (
+        moment(this.startTime).isAfter(moment(this.endTime))
+      ) {
+        this.endTime = this.startTime;
       }
+      this.durationDay = moment(this.endTime).diff(moment(this.startTime), "days")
+      this.durationHour = moment(this.endTime).diff(moment(this.startTime), "hours")-this.durationDay*24
       
     },
-    // handleConfirm1(data) {
-    //     console.log('start')
-    //   let date = moment(data).format("YYYY-MM-DD HH:mm");
-    //   this.dateTime = date;
-    // },
-    // handleConfirm2(data) {
-    //     console.log('end')
-    //   let date = moment(data).format("YYYY-MM-DD HH:mm");
-    //   this.endTime = date;
-    // },
-    getStart(e){
-      // alert(e)
-      this.dateTime = e
-      this.dateTimeshow =0
+    handleConfirm2(data) {
+      let date = moment(data).format("YYYY-MM-DD HH:mm");
+      this.endTime = date;
+      if (moment(this.endTime).isBefore(moment(this.startTime))) {
+        this.endTime = this.startTime;
+        Toast("结束时间不能早于开始时间");
+        return;
+      } else if (
+        moment(this.endTime).diff(moment(this.startTime)) > 432000000
+      ) {
+        this.endTime = this.startTime;
+        Toast("请假时间不能大于5天");
+        return;
+      }
+      this.durationDay = moment(this.endTime).diff(moment(this.startTime), "days")
+      this.durationHour = moment(this.endTime).diff(moment(this.startTime), "hours")-this.durationDay*24
     },
-    getEnd(e){
-      this.endTime = e
-        this.endTimeshow = 0;
-      
+    getNowTime() {
+      let now = moment(new Date()).format("YYYY-MM-DD HH:mm");
+      this.startTime = now;
+      this.endTime = now;
     }
   }
 };
@@ -211,7 +220,7 @@ export default {
   .user_image {
     width: 90px;
     height: 90px;
-    background: url(../assets/img/Avatar.png) no-repeat;
+    background: url(../../static/img/Avatar.png) no-repeat;
     background-size: cover;
     position: absolute;
     left: 50%;
@@ -261,7 +270,7 @@ export default {
         content: "";
         width: 17px;
         height: 10px;
-        background: url(../assets/img/pull.png) no-repeat;
+        background: url(../../static/img/pull.png) no-repeat;
         background-size: cover;
         position: absolute;
         top: 30%;

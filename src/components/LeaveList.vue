@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div class="list">
     <div class="top">
         <div class="status">
             
@@ -67,7 +67,7 @@ export default {
 </script>
 <style lang="less" scoped>
 @import '../../static/css/common.less';
-#app {
+.list {
   background: #f5f5f5;
   .leaveList {
     margin-top: 64px;

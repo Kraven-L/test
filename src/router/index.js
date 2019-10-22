@@ -8,11 +8,7 @@ Vue.use(Router)
 export default new Router({
   routes: [
     {
-      path: '#/',
-      redirect:'/application'
-    },
-    {
-      path: '/application',
+      path: '/',
       name: 'Application',
       component: Application
     },
